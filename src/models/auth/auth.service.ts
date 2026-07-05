@@ -1,5 +1,9 @@
+import { z } from "zod";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/AppError";
 import { ICreateUser } from "./auth.interface";
+
+
 
 const createUserIntoDB = async (payload: ICreateUser) => {
     const isUserExists = await prisma.user.findUnique({
@@ -9,7 +13,7 @@ const createUserIntoDB = async (payload: ICreateUser) => {
     })
 
     if (isUserExists) {
-        throw new Error("User already exists")
+        throw new AppError(409, "User already exists")
     }
 
     //bcrypt the pass
