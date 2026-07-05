@@ -13,7 +13,10 @@ const createUserIntoDB = async (payload: ICreateUser) => {
   const { name, email, password, phone, role, address, avatarUrl } = payload;
 
   if (!allowedRoles.includes(role)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Role must be either CUSTOMER or TECHNICIAN");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Role must be either CUSTOMER or TECHNICIAN",
+    );
   }
 
   const isUserExists = await prisma.user.findUnique({ where: { email } });
@@ -21,9 +24,11 @@ const createUserIntoDB = async (payload: ICreateUser) => {
     throw new AppError(httpStatus.CONFLICT, "User already exists");
   }
 
-  const hashedPassword = await bcrypt.hash(password, Number(config.bcrypt_salt_rounds));
+  const hashedPassword = await bcrypt.hash(
+    password,
+    Number(config.bcrypt_salt_rounds),
+  );
 
-  
   if (payload.role === "TECHNICIAN") {
     const { bio, skills, hourlyRate, experienceYrs, location } = payload;
 
@@ -42,7 +47,7 @@ const createUserIntoDB = async (payload: ICreateUser) => {
             skills: skills,
             hourlyRate: hourlyRate!,
             experienceYrs: experienceYrs,
-            location: location ?? address, 
+            location: location ?? address,
           },
         },
       },
@@ -71,20 +76,24 @@ const createUserIntoDB = async (payload: ICreateUser) => {
 const loginUser = async (payload: ILoginUser) => {
   const { email, password } = payload;
 
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUnique({
     where: {
       email,
     },
   });
-  
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
   if (user.status === "BANNED") {
-        throw new Error("User is blocked");
-    }
+    throw new AppError(httpStatus.FORBIDDEN, "User is blocked");
+  }
 
   const isPasswordMatch = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatch) {
-    throw new Error("Invalid email or password");
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password");
   }
 
   const jwtPayload = {
@@ -104,7 +113,7 @@ const loginUser = async (payload: ILoginUser) => {
     jwtPayload,
     config.jwt_refresh_secret,
     config.jwt_refresh_expires_in as SignOptions,
-  )
+  );
 
   return {
     accessToken,
@@ -112,38 +121,36 @@ const loginUser = async (payload: ILoginUser) => {
   };
 };
 
-
 const getMyInfo = async (userId: string) => {
-    const user = await prisma.user.findUnique({
-        where: {
-            id: userId
-        },
-        include: {
-            technicianProfile: true
-        },
-        omit: {
-            password: true
-        }
-    })
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      technicianProfile: true,
+    },
+    omit: {
+      password: true,
+    },
+  });
 
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "User not found")
-    }
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
 
-    if (user.status === "BANNED") {
-        throw new AppError(httpStatus.FORBIDDEN, "User is blocked")
-    }
+  if (user.status === "BANNED") {
+    throw new AppError(httpStatus.FORBIDDEN, "User is blocked");
+  }
 
-    if (user?.role === "CUSTOMER") {
-        const {technicianProfile, ...userInfo} = user;
-        return userInfo
-    }
-    return user
-
-}
+  if (user?.role === "CUSTOMER") {
+    const { technicianProfile, ...userInfo } = user;
+    return userInfo;
+  }
+  return user;
+};
 
 export const authService = {
   createUserIntoDB,
   loginUser,
-  getMyInfo
+  getMyInfo,
 };
