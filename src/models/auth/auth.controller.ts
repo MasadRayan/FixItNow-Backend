@@ -45,7 +45,9 @@ const loginUser = easycontroller(
 );
 
 const myInfo = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
-    
+    const userId = req.user?.id;
+    const result = await authService.getMyInfo(userId as string);
+    sendResponse(res, httpStatus.OK, true, "User info fetched successfully", result);
 });
 
 export const authController = {

@@ -113,7 +113,37 @@ const loginUser = async (payload: ILoginUser) => {
 };
 
 
+const getMyInfo = async (userId: string) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId
+        },
+        include: {
+            technicianProfile: true
+        },
+        omit: {
+            password: true
+        }
+    })
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found")
+    }
+
+    if (user.status === "BANNED") {
+        throw new AppError(httpStatus.FORBIDDEN, "User is blocked")
+    }
+
+    if (user?.role === "CUSTOMER") {
+        const {technicianProfile, ...userInfo} = user;
+        return userInfo
+    }
+    return user
+
+}
+
 export const authService = {
   createUserIntoDB,
-  loginUser
+  loginUser,
+  getMyInfo
 };
