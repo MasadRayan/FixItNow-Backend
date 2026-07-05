@@ -1,6 +1,21 @@
 import express, { Application } from "express";
+import cors from "cors"
+import cookieParser from "cookie-parser";
+
 
 const app : Application = express();
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}))
+
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use(cookieParser())
+
 
 app.get("/",(req, res) => {
     res.json({
