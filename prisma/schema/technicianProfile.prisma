@@ -6,8 +6,6 @@ model TechnicianProfile {
     experienceYrs Int      @default(0)
     hourlyRate    Decimal  @db.Decimal(10, 2)
     location      String?
-    latitude      Float?
-    longitude     Float?
     avgRating     Float    @default(0)
     totalReviews  Int      @default(0)
     isVerified    Boolean  @default(false)

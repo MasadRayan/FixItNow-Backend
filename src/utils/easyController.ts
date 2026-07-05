@@ -5,8 +5,8 @@ export const easycontroller = (fn :RequestHandler) => {
         try{
             await fn(req, res, next)
         }
-        catch(err){
-            next(err)
+        catch(error: any){
+            next(error)
         }
     }
 }

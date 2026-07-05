@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import { authRouter } from "./models/auth/auth.route";
+import globalHandler from "./middleware/globalErrorHandler";
 
 
 const app : Application = express();
@@ -26,6 +27,10 @@ app.get("/",(req, res) => {
 })
 
 app.use("/api/auth", authRouter)
+
+
+
+app.use(globalHandler)
 
 
 export default app

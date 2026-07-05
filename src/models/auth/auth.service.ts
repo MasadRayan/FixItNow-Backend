@@ -1,27 +1,71 @@
-import { z } from "zod";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { ICreateUser } from "./auth.interface";
+import bcrypt from "bcryptjs";
+import httpStatus from "http-status";
+import config from "../../config";
 
-
+const allowedRoles = ["CUSTOMER", "TECHNICIAN"];
 
 const createUserIntoDB = async (payload: ICreateUser) => {
-    const isUserExists = await prisma.user.findUnique({
-        where: {
-            email: payload.email
-        }
-    })
+  const { name, email, password, phone, role, address, avatarUrl } = payload;
 
-    if (isUserExists) {
-        throw new AppError(409, "User already exists")
-    }
+  if (!allowedRoles.includes(role)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Role must be either CUSTOMER or TECHNICIAN");
+  }
 
-    //bcrypt the pass
-    //validate is the email is a valid
-    //restrict roles to only customer and technician
-}
+  const isUserExists = await prisma.user.findUnique({ where: { email } });
+  if (isUserExists) {
+    throw new AppError(httpStatus.CONFLICT, "User already exists");
+  }
 
+  const hashedPassword = await bcrypt.hash(password, Number(config.bcrypt_salt_rounds));
+
+  
+  if (payload.role === "TECHNICIAN") {
+    const { bio, skills, hourlyRate, experienceYrs, location } = payload;
+
+    const result = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        phone,
+        role,
+        address,
+        avatarUrl,
+        technicianProfile: {
+          create: {
+            bio,
+            skills: skills,
+            hourlyRate: hourlyRate!,
+            experienceYrs: experienceYrs,
+            location: location ?? address, 
+          },
+        },
+      },
+      omit: { password: true },
+    });
+
+    return result;
+  }
+
+  const result = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role,
+      address,
+      avatarUrl,
+    },
+    omit: { password: true },
+  });
+
+  return result;
+};
 
 export const authService = {
-    createUserIntoDB
-}
+  createUserIntoDB,
+};
