@@ -24,3 +24,9 @@ export type ICreateUser =
       experienceYrs?: number;
       location?: string;
     };
+
+
+    export interface ILoginUser {
+    email: string,
+    password: string
+}
