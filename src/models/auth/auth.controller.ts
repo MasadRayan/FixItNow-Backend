@@ -44,7 +44,12 @@ const loginUser = easycontroller(
   },
 );
 
+const myInfo = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
+
+});
+
 export const authController = {
   createUser,
   loginUser,
+  myInfo
 };
