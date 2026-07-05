@@ -1,4 +1,4 @@
 node_modules
 .env
-prisma/migrate 
+prisma/migrations
 /generated
