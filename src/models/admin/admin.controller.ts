@@ -9,7 +9,13 @@ const createCategory = easycontroller(async (req: any, res: any, next: any) => {
     sendResponse(res, httpStatus.CREATED, true, "Category created successfully", rusult)
 });
 
+const getAllCategory = easycontroller(async (req: any, res: any, next: any) => {
+    const result = await adminService.getAllCategory();
+    sendResponse(res, httpStatus.OK, true, "All Categories fetched successfully", result)
+})
+
 
 export const adminController = {
-    createCategory
+    createCategory,
+    getAllCategory
 }
