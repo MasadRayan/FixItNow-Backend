@@ -14,8 +14,15 @@ const getAllCategory = easycontroller(async (req: any, res: any, next: any) => {
     sendResponse(res, httpStatus.OK, true, "All Categories fetched successfully", result)
 })
 
+const getAllUsers = easycontroller(async (req: any, res: any, next: any) => {
+    const query = req.query
+    const result = await adminService.getAllUsersFromDB(query);
+    sendResponse(res, httpStatus.OK, true, "All Users fetched successfully", result)
+})
+
 
 export const adminController = {
     createCategory,
-    getAllCategory
+    getAllCategory,
+    getAllUsers
 }

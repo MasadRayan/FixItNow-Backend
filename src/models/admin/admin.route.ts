@@ -7,5 +7,6 @@ const router = Router();
 
 router.post("/categories", auth(Role.ADMIN), adminController.createCategory);
 router.get("/categories", auth(Role.ADMIN), adminController.getAllCategory);
+router.get("/allUsers", auth(Role.ADMIN), adminController.getAllUsers);
 
 export const adminRouter = router
