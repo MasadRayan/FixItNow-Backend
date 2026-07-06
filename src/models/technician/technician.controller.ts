@@ -11,14 +11,7 @@ const updateUserProfiole = easycontroller(async (req: Request, res: Response, ne
     sendResponse(res, httpStatus.OK, true, "Technician profile updated successfully", result)
 })
 
-const createService = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body;
-    const userId = req.user?.id as string;
-    const result = await technicianService.createServiceIntoDB(userId as string, payload);
-    sendResponse(res, httpStatus.CREATED, true, "Service created successfully", result)
-})
 
 export const technicianController = {
     updateUserProfiole,
-    createService
 }
