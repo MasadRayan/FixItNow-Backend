@@ -1,7 +1,7 @@
 import { th } from "zod/v4/locales/index.js";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { IupdateTechnicianProfile } from "./technician.interface";
+import { ICreateService, IupdateTechnicianProfile } from "./technician.interface";
 import httpStatus from "http-status";
 
 const updateTEchnicianProfileINDB = async (userId: string, payload: IupdateTechnicianProfile) => {
@@ -48,7 +48,57 @@ const updateTEchnicianProfileINDB = async (userId: string, payload: IupdateTechn
     return updatedUser
 }
 
+const createServiceIntoDB = async(userId: string, payload: ICreateService) => {
+    const { category, description, durationMins, price, title} = payload;
+
+    const isCategoryExists = await prisma.category.findFirst({
+        where: {
+            name: {
+                equals: category,
+                mode: "insensitive"
+            }
+        }
+    })
+
+    if (!isCategoryExists) {
+        throw new AppError(httpStatus.NOT_FOUND, "Category not found")
+    }
+
+    const technicianProfile = await prisma.technicianProfile.findUnique({
+        where: {
+            userId
+        }
+    })
+
+    if (!technicianProfile) {
+        throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found")
+    }
+
+    const categoryId = isCategoryExists.id;
+
+    const service = await prisma.service.create({
+        data: {
+            title,
+            description,
+            durationMins,
+            price,
+            category: {
+                connect: {
+                    id: categoryId
+                }
+            },
+            technician: {
+                connect: {
+                    userId
+                }
+            }
+        }
+    })
+    return service
+}
+
 
 export const  technicianService = {
-    updateTEchnicianProfileINDB
+    updateTEchnicianProfileINDB,
+    createServiceIntoDB
 }

@@ -7,7 +7,6 @@ import config from "../config";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status";
 import { prisma } from "../lib/prisma";
-import { th } from "zod/v4/locales/index.js";
 
 const auth =  (...requiredRoles : Role[]) => {
     return easycontroller(async (req: Request, res: Response, next: NextFunction) => {
