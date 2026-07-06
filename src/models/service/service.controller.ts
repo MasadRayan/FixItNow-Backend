@@ -11,6 +11,13 @@ const createService = easycontroller(async (req: Request, res: Response, next: N
     sendResponse(res, httpStatus.CREATED, true, "Service created successfully", result)
 })
 
+const getAllServices = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query
+    const result = await serviceService.getAllServicesFromDB(query);
+    sendResponse(res, httpStatus.OK, true, "Services fetched successfully", result)
+})
+
 export const serviceController = {
-    createService
+    createService,
+    getAllServices
 }
