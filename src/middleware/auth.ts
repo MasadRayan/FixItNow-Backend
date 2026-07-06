@@ -28,7 +28,7 @@ const auth =  (...requiredRoles : Role[]) => {
         const {id, name, email, role, status} = verifyToken.data as JwtPayload;
 
         if (!requiredRoles.includes(role)) {
-            throw new AppError(httpStatus.FORBIDDEN, "Forbidden");
+            throw new AppError(httpStatus.FORBIDDEN, "Forbidden access");
         }
 
         const user = await prisma.user.findUnique({

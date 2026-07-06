@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser";
 import { authRouter } from "./models/auth/auth.route";
 import globalHandler from "./middleware/globalErrorHandler";
+import { technicianRouter } from "./models/technician/technician.route";
 
 
 const app : Application = express();
@@ -27,6 +28,7 @@ app.get("/",(req, res) => {
 })
 
 app.use("/api/auth", authRouter)
+app.use("/api/technician", technicianRouter)
 
 
 
