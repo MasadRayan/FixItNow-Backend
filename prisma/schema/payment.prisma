@@ -9,13 +9,11 @@ model Payment {
     paidAt        DateTime?
     failureReason String?
 
-    // Raw gateway metadata (session id, webhook payload refs, etc.)
     gatewayMeta Json?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    // Relations
     booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
     customer User    @relation("CustomerPayments", fields: [customerId], references: [id], onDelete: Cascade)
 

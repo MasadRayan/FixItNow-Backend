@@ -4,9 +4,11 @@ import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import {
   ITechnicianFilters,
+  IUpdateAvailability,
   IupdateTechnicianProfile,
 } from "./technician.interface";
 import httpStatus from "http-status";
+import { DayOfWeek } from "../../../generated/prisma/enums";
 
 const updateTEchnicianProfileINDB = async (
   userId: string,
@@ -246,8 +248,67 @@ const getTechnicianByIdFromDB = async (technicianID : string) => {
   return technician
 }
 
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; 
+const allowedDays = Object.values(DayOfWeek);
+
+const updateAvailabilityInDB = async (userId: string, payload: IUpdateAvailability) => {
+  if (!Array.isArray(payload) || payload.length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Availability must be a non-empty array of slots");
+  }
+
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+  }
+
+  for (const slot of payload) {
+    const { dayOfWeek, startTime, endTime } = slot;
+
+    if (!allowedDays.includes(dayOfWeek)) {
+      throw new AppError(httpStatus.BAD_REQUEST, `Invalid dayOfWeek: ${dayOfWeek}`);
+    }
+
+    if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+      throw new AppError(httpStatus.BAD_REQUEST, "startTime and endTime must be in HH:mm format");
+    }
+
+    if (startTime >= endTime) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `startTime must be before endTime for ${dayOfWeek}`
+      );
+    }
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.technicianAvailability.deleteMany({
+      where: { technicianId: technicianProfile.id },
+    });
+
+    await tx.technicianAvailability.createMany({
+      data: payload.map((slot) => ({
+        technicianId: technicianProfile.id,
+        dayOfWeek: slot.dayOfWeek,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      })),
+    });
+
+    return tx.technicianAvailability.findMany({
+      where: { technicianId: technicianProfile.id },
+      orderBy: { dayOfWeek: "asc" },
+    });
+  });
+
+  return result;
+};
+
 export const technicianService = {
   updateTEchnicianProfileINDB,
   getAllTechniciansFromDB,
-  getTechnicianByIdFromDB
+  getTechnicianByIdFromDB,
+  updateAvailabilityInDB
 };

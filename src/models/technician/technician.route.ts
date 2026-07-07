@@ -8,4 +8,5 @@ const router = Router();
 router.get("/", technicianController.getAllTechnicians);
 router.get("/:id", technicianController.getTechnicianById);
 router.patch("/profile", auth(Role.TECHNICIAN), technicianController.updateUserProfiole);
+router.put("/availability", auth(Role.TECHNICIAN), technicianController.updateAvailability);
 export const technicianRouter = router

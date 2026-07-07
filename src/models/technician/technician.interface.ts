@@ -1,3 +1,5 @@
+import { DayOfWeek } from "../../../generated/prisma/enums";
+
 export interface IupdateTechnicianProfile {
     name?: string;
     phone?: string;
@@ -20,3 +22,11 @@ export interface ITechnicianFilters {
   page?: number;
   limit?: number;
 }
+
+export interface IAvailabilitySlot {
+  dayOfWeek: DayOfWeek;
+  startTime: string; 
+  endTime: string;   
+}
+
+export type IUpdateAvailability = IAvailabilitySlot[];

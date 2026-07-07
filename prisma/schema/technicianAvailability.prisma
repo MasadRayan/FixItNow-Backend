@@ -2,8 +2,8 @@ model TechnicianAvailability {
     id           String    @id @default(uuid())
     technicianId String
     dayOfWeek    DayOfWeek
-    startTime    String // "09:00" — stored as HH:mm
-    endTime      String // "17:00"
+    startTime    String 
+    endTime      String 
     isActive     Boolean   @default(true)
 
     createdAt DateTime @default(now())
