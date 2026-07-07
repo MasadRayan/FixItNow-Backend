@@ -27,6 +27,8 @@ This file lists the API routes created and implemented in this project.
 ## Booking Routes
 - POST /api/bookings/create
 - PATCH /api/bookings/status/:id
+- GET /api/bppkings
+- GET /api/bookings/:id
 
 ## Payment Routes
 - POST /api/payments/create

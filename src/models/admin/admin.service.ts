@@ -57,7 +57,9 @@ const getAllCategory = async () => {
 const getAllUsersFromDB = async (filters: IUserFilters) => {
   const { role, status, search, page = 1, limit = 10 } = filters;
 
-  const conditions: Prisma.UserWhereInput[] = [];
+  const conditions: Prisma.UserWhereInput[] = [
+  { role: { not: "ADMIN" } },
+  ];
 
   if (role) {
     conditions.push({ role });
