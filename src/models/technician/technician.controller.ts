@@ -12,7 +12,8 @@ const updateUserProfiole = easycontroller(async (req: Request, res: Response, ne
 })
 
 const getAllTechnicians = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await technicianService.getAllTechniciansFromDB()
+    const query = req.query;
+    const result = await technicianService.getAllTechniciansFromDB(query)
     sendResponse(res, httpStatus.OK, true, "Technicians fetched successfully", result)
 })
 

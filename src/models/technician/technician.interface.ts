@@ -9,3 +9,14 @@ export interface IupdateTechnicianProfile {
     experienceYrs?: number;
     location?: string;
 }
+
+export interface ITechnicianFilters {
+  skill?: string;
+  location?: string;
+  minRating?: number;
+  minExperience?: number;
+  search?: string;
+  category?: string;
+  page?: number;
+  limit?: number;
+}
