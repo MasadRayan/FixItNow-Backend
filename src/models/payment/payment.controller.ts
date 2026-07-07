@@ -21,7 +21,7 @@ const webhook = easycontroller(async (req: Request, res: Response, next: NextFun
 const getMyPayments = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     const result = await paymentService.getMyPaymentsFromDB(userId as string);
-    sendResponse(res, httpStatus.OK, true, "Payment created successfully", result)
+    sendResponse(res, httpStatus.OK, true, "All My Payments fetched successfully", result)
 })
 
 export const paymentController = {
