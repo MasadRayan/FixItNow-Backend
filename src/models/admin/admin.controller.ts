@@ -20,9 +20,17 @@ const getAllUsers = easycontroller(async (req: any, res: any, next: any) => {
     sendResponse(res, httpStatus.OK, true, "All Users fetched successfully", result)
 })
 
+const updateUserStatus = easycontroller(async (req: any, res: any, next: any) => {
+    const userId = req.params.id;
+    const payload = req.body;
+    const result = await adminService.updateUserStatusIntoDB(userId, payload);
+    sendResponse(res, httpStatus.OK, true, "User status updated successfully", result)
+})
+
 
 export const adminController = {
     createCategory,
     getAllCategory,
-    getAllUsers
+    getAllUsers,
+    updateUserStatus
 }

@@ -1,3 +1,5 @@
+import { Role, UserStatus } from "../../../generated/prisma/enums";
+
 export interface ICreateCategory {
     name : string;
     description ?: string;
@@ -5,9 +7,13 @@ export interface ICreateCategory {
 }
 
 export interface IUserFilters {
-  role?: "CUSTOMER" | "TECHNICIAN" | "ADMIN";
-  status?: "ACTIVE" | "BANNED";
+  role?: Role
+  status?: UserStatus;
   search?: string;
   page?: number;
   limit?: number;
+}
+
+export interface IUpdateUserStatus {
+    status : UserStatus;
 }
