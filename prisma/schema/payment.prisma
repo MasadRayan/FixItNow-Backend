@@ -8,6 +8,7 @@ model Payment {
     status        PaymentStatus   @default(PENDING)
     paidAt        DateTime?
     failureReason String?
+    stripeSessionId String?
 
     gatewayMeta Json?
 
