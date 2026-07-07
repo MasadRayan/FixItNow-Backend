@@ -3,11 +3,13 @@ import { Prisma, UserStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import {
+  IBookingFilters,
   ICreateCategory,
   IUpdateUserStatus,
   IUserFilters,
 } from "./admin.interface";
 import httpStatus from "http-status";
+import { BookingWhereInput } from "../../../generated/prisma/models";
 
 const createCategoryInDb = async (payload: ICreateCategory) => {
   const { name, description, iconUrl } = payload;
@@ -167,9 +169,103 @@ const updateUserStatusIntoDB = async (
   return result;
 };
 
+const getAllBookingsFromDB = async (filters: IBookingFilters) => {
+  const {
+    status,
+    customerId,
+    technicianId,
+    fromDate,
+    toDate,
+    search,
+    page = 1,
+    limit = 10,
+  } = filters;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const andConditions: BookingWhereInput[] = [];
+  if (status) {
+    andConditions.push({ status });
+  }
+
+  if (customerId) {
+    andConditions.push({ customerId });
+  }
+
+  if (technicianId) {
+    andConditions.push({ technicianId });
+  }
+
+  if (fromDate || toDate) {
+    andConditions.push({
+      scheduledAt: {
+        ...(fromDate && { gte: new Date(fromDate) }),
+        ...(toDate && { lte: new Date(toDate) }),
+      },
+    });
+  }
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        { customer: { name: { contains: search, mode: "insensitive" } } },
+        {
+          technician: {
+            user: { name: { contains: search, mode: "insensitive" } },
+          },
+        },
+      ],
+    });
+  }
+
+  const [bookings, total] = await Promise.all([
+    prisma.booking.findMany({
+      where: {
+        AND: andConditions,
+      },
+      include: {
+        customer: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        technician: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take: Number(limit),
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.booking.count({
+      where: {
+        AND: andConditions,
+      },
+    }),
+  ]);
+
+  return {
+    meta: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      totalPages: Math.ceil(total / Number(limit)),
+    },
+    data: bookings,
+  };
+};
+
 export const adminService = {
   createCategoryInDb,
   getAllCategory,
   getAllUsersFromDB,
   updateUserStatusIntoDB,
+  getAllBookingsFromDB,
 };

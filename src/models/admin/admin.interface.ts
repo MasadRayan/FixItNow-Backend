@@ -1,4 +1,4 @@
-import { Role, UserStatus } from "../../../generated/prisma/enums";
+import { BookingStatus, Role, UserStatus } from "../../../generated/prisma/enums";
 
 export interface ICreateCategory {
     name : string;
@@ -16,4 +16,15 @@ export interface IUserFilters {
 
 export interface IUpdateUserStatus {
     status : UserStatus;
+}
+
+export interface IBookingFilters {
+  status?: BookingStatus;
+  customerId?: string;
+  technicianId?: string;
+  fromDate?: string;
+  toDate?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
 }
