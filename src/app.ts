@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { application, Application } from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import { authRouter } from "./models/auth/auth.route";
@@ -9,6 +9,7 @@ import { serviceRouter } from "./models/service/service.route";
 import { categoryRouter } from "./models/category/category.route";
 import { bookingRouter } from "./models/booking/booking.route";
 import { paymentRouter } from "./models/payment/payment.route";
+import { json } from "zod";
 
 
 const app : Application = express();
@@ -19,6 +20,8 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }))
+
+app.post("/api/payment/webhook", express.raw({ type: "application/json" }))
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))

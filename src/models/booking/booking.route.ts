@@ -6,7 +6,7 @@ import { exportBuffer } from "node:ffi";
 
 const router = Router();
 
-router.post("/create", auth(Role.CUSTOMER, Role.ADMIN, Role.TECHNICIAN), bookingController.createBooking);
+router.post("/create", auth(Role.CUSTOMER), bookingController.createBooking);
 router.patch("/status/:id", auth(Role.TECHNICIAN), bookingController.updateBookingStatus);
 
 export const bookingRouter = router
