@@ -135,7 +135,12 @@ const webhook = async (payload: Buffer, signature: string) => {
   }
 };
 
+const getMyPaymentsFromDB = async (userId: string) => {
+    
+}
+
 export const paymentService = {
   createPayment,
   webhook,
+  getMyPaymentsFromDB
 };

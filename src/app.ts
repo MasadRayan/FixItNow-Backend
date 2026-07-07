@@ -21,7 +21,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
 }))
 
-app.post("/api/payment/webhook", express.raw({ type: "application/json" }))
+app.post("/api/payment/confirm", express.raw({ type: "application/json" }))
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
