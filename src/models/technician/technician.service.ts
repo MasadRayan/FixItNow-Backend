@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client";
+import { email } from "zod";
 import { TechnicianProfileWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
@@ -199,7 +199,55 @@ const getAllTechniciansFromDB = async (query: ITechnicianFilters) => {
   };
 };
 
+const getTechnicianByIdFromDB = async (technicianID : string) => {
+  const technician = await prisma.technicianProfile.findUnique({
+    where: {
+      id: technicianID,
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          avatarUrl: true,
+          address: true,
+          phone: true,
+          email: true,
+          status: true
+        }
+      },
+      services: {
+        where: {
+          isActive: true
+        }
+      },
+      reviews: {
+        include: {
+          customer: {
+            select: {
+              name: true,
+              email: true,
+              avatarUrl: true,
+            }
+          }
+        }
+      },
+      _count: {
+        select: {
+          services: true,
+          reviews: true,
+        },
+      },
+    },
+  });
+
+  if (!technician) {
+    throw new AppError(httpStatus.NOT_FOUND, "Technician not found");
+  }
+  return technician
+}
+
 export const technicianService = {
   updateTEchnicianProfileINDB,
   getAllTechniciansFromDB,
+  getTechnicianByIdFromDB
 };
