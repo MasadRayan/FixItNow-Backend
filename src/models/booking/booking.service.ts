@@ -6,7 +6,10 @@ import { ICreateBooking, IupdateBookingStatus } from "./booking.interface";
 import { th } from "zod/v4/locales/index.js";
 import { BookingStatus } from "../../../generated/prisma/enums";
 
-const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) => {
+const createBookingIntoDB = async (
+  customerId: string,
+  payload: ICreateBooking,
+) => {
   const { serviceId, scheduledAt, address, notes } = payload;
 
   const isValidUser = await prisma.user.findUnique({
@@ -22,23 +25,32 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
   }
 
   if (!serviceId || !scheduledAt || !address) {
-    throw new AppError(httpStatus.BAD_REQUEST, "serviceId, scheduledAt, and address are required");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "serviceId, scheduledAt, and address are required",
+    );
   }
 
   const scheduledDate = new Date(scheduledAt);
   if (isNaN(scheduledDate.getTime())) {
-    throw new AppError(httpStatus.BAD_REQUEST, "scheduledAt must be a valid date");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "scheduledAt must be a valid date",
+    );
   }
 
   if (scheduledDate <= new Date()) {
-    throw new AppError(httpStatus.BAD_REQUEST, "scheduledAt must be a future date/time");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "scheduledAt must be a future date/time",
+    );
   }
 
   const service = await prisma.service.findUnique({
     where: { id: serviceId },
     include: {
-        technician: true
-    }
+      technician: true,
+    },
   });
 
   if (!service) {
@@ -46,16 +58,21 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
   }
 
   if (!service.isActive) {
-    throw new AppError(httpStatus.BAD_REQUEST, "This service is not currently active");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "This service is not currently active",
+    );
   }
 
   const technicianLocation = service.technician.location;
   if (technicianLocation) {
-    const addressMatches = address.toLowerCase().includes(technicianLocation.toLowerCase());
+    const addressMatches = address
+      .toLowerCase()
+      .includes(technicianLocation.toLowerCase());
     if (!addressMatches) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `This technician only serves ${technicianLocation}. Please book a technician in your area.`
+        `This technician only serves ${technicianLocation}. Please book a technician in your area.`,
       );
     }
   }
@@ -64,7 +81,10 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
     where: { userId: customerId },
   });
   if (customerProfile && customerProfile.id === service.technicianId) {
-    throw new AppError(httpStatus.BAD_REQUEST, "You cannot book your own service");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You cannot book your own service",
+    );
   }
 
   const booking = await prisma.booking.create({
@@ -80,46 +100,55 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
     include: {
       service: {
         include: {
-            category: true
-        }
+          category: true,
+        },
       },
-      technician: { 
+      technician: {
         include: {
-            user: {
-                select: {
-                    name: true,
-                    email: true,
-                    phone: true
-                }
-            }
-        }
-       },
+          user: {
+            select: {
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
     },
   });
 
   return booking;
 };
 
-const allowedStatuses : BookingStatus[] = ["ACCEPTED", "DECLINED", "IN_PROGRESS", "COMPLETED"];
+const allowedStatuses: BookingStatus[] = [
+  "ACCEPTED",
+  "DECLINED",
+  "IN_PROGRESS",
+  "COMPLETED",
+];
 
 const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
   REQUESTED: ["ACCEPTED", "DECLINED"],
-  ACCEPTED: [],            
-  DECLINED: [],            
+  ACCEPTED: [],
+  DECLINED: [],
   PAID: ["IN_PROGRESS"],
   IN_PROGRESS: ["COMPLETED"],
-  COMPLETED: [],           
-  CANCELLED: [],           
+  COMPLETED: [],
+  CANCELLED: [],
 };
 
-const updateBookingStatusIntoDB = async (bookingId: string, payload: IupdateBookingStatus, technicianId: string) => {
+const updateBookingStatusIntoDB = async (
+  bookingId: string,
+  payload: IupdateBookingStatus,
+  technicianId: string,
+) => {
   const { status } = payload;
 
   if (!allowedStatuses.includes(status as BookingStatus)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid status");
   }
 
-  const validatedStatus = status as BookingStatus
+  const validatedStatus = status as BookingStatus;
 
   const validTechnician = await prisma.technicianProfile.findUnique({
     where: { userId: technicianId },
@@ -133,27 +162,33 @@ const updateBookingStatusIntoDB = async (bookingId: string, payload: IupdateBook
     where: {
       id: bookingId,
     },
-  })
+  });
 
   if (!isBookingExists) {
     throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
   }
 
   if (isBookingExists.technicianId !== validTechnician.id) {
-    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to update this booking");
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not authorized to update this booking",
+    );
   }
 
   const currentStatus = isBookingExists.status;
 
   if (currentStatus === validatedStatus) {
-    throw new AppError(httpStatus.CONFLICT, "Booking status is already set to this value");
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "Booking status is already set to this value",
+    );
   }
 
   const nextAllowed = allowedTransitions[currentStatus];
   if (!nextAllowed.includes(validatedStatus)) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `Cannot change status from ${currentStatus} to ${validatedStatus}`
+      `Cannot change status from ${currentStatus} to ${validatedStatus}`,
     );
   }
 
@@ -162,15 +197,65 @@ const updateBookingStatusIntoDB = async (bookingId: string, payload: IupdateBook
       id: bookingId,
     },
     data: {
-      status: validatedStatus
-    }, 
+      status: validatedStatus,
+    },
   });
 
-  return updatedBooking
+  return updatedBooking;
+};
 
+const getMyBookingsFromDB = async (userId: string, role: string) => {
+  if (role === "CUSTOMER") {
+    return prisma.booking.findMany({
+      where: { customerId: userId },
+      include: {
+        service: {
+          select: {
+            title: true,
+            description: true,
+            price: true,
+            durationMins: true,
+            isActive: true,
+            category: {
+              select: {
+                name: true,
+                description: true,
+              }
+            },
+          },
+        },
+        technician: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+            bio: true,
+            location: true,
+            experienceYrs: true,
+            hourlyRate: true,
+            totalReviews: true,
+            avgRating: true,
+          }
+        },
+        payment: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+  throw new AppError(httpStatus.FORBIDDEN, "Invalid role for this operation");
 };
 
 export const bookingService = {
   createBookingIntoDB,
   updateBookingStatusIntoDB,
+  getMyBookingsFromDB,
 };

@@ -17,11 +17,25 @@ This file lists the API routes created and implemented in this project.
 - POST /api/admin/categories
 - GET /api/admin/categories
 - GET /api/admin/allUsers
+- GET /api/admin/bookings
 - PATCH /api/admin/user/:id
 
 ## Service Routes
 - POST /api/services/
 - GET /api/services/
+
+## Booking Routes
+- POST /api/bookings/create
+- PATCH /api/bookings/status/:id
+
+## Payment Routes
+- POST /api/payments/create
+- POST /api/payments/confirm
+- GET /api/payments/
+- GET /api/payments/:id
+
+## Review Routes
+- POST /api/reviews/
 
 ## Category Routes
 - GET /api/category/

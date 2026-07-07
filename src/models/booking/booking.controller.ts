@@ -19,7 +19,17 @@ const updateBookingStatus = easycontroller(async (req: Request, res: Response, n
     sendResponse(res, httpStatus.OK, true, "Booking status updated successfully", result)
 })
 
+const getMyBookings = easycontroller(async (req: Request, res: Response) => {
+  const userId = req.user?.id as string;
+  const role = req.user?.role as string;
+
+  const result = await bookingService.getMyBookingsFromDB(userId, role);
+
+  sendResponse(res, httpStatus.OK, true, "Bookings fetched successfully", result);
+});
+
 export const bookingController = {
     createBooking,
-    updateBookingStatus
+    updateBookingStatus,
+    getMyBookings
 }
