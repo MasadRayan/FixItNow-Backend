@@ -160,22 +160,54 @@ const getAllTechniciansFromDB = async (query: ITechnicianFilters) => {
         AND: andCondition,
       },
       include: {
-        user: {
-          select: {
-            name: true,
-            avatarUrl: true,
-            address: true,
+      user: {
+        select: {
+          name: true,
+          avatarUrl: true,
+          address: true,
+          phone: true,
+          email: true,
+          status: true
+        }
+      },
+      services: {
+        where: {
+          isActive: true
+        }
+      },
+      bookings: {
+        select: {
+          status: true,
+          priceAtBooking: true,
+          payment: {
+            select: {
+              status: true,
+            }
           },
-        },
-        services: true,
-        reviews: true,
-        _count: {
-          select: {
-            services: true,
-            reviews: true,
-          },
+          customer: {
+            select: {
+              name: true,
+              phone: true,
+              email: true,
+              avatarUrl: true,
+            }
+          }
+        }
+      },
+      reviews: {
+        select: {
+          rating: true,
+          comment: true,
+        }
+      },
+      _count: {
+        select: {
+          services: true,
+          reviews: true,
+          bookings: true
         },
       },
+    },
       orderBy: {
         avgRating: "desc",
       },
@@ -222,21 +254,36 @@ const getTechnicianByIdFromDB = async (technicianID : string) => {
           isActive: true
         }
       },
-      reviews: {
-        include: {
+      bookings: {
+        select: {
+          status: true,
+          priceAtBooking: true,
+          payment: {
+            select: {
+              status: true,
+            }
+          },
           customer: {
             select: {
               name: true,
+              phone: true,
               email: true,
               avatarUrl: true,
             }
           }
         }
       },
+      reviews: {
+        select: {
+          rating: true,
+          comment: true,
+        }
+      },
       _count: {
         select: {
           services: true,
           reviews: true,
+          bookings: true
         },
       },
     },
