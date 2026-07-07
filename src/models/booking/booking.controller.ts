@@ -10,3 +10,7 @@ const createBooking = easycontroller(async (req: Request, res: Response, next: N
     const result = await bookingService.createBookingIntoDB(userId as string ,payload)
     sendResponse(res, httpStatus.CREATED, true, "Booking created successfully", result)
 });
+
+export const bookingController = {
+    createBooking
+}

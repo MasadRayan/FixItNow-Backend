@@ -150,6 +150,7 @@ const getAllServicesFromDB = async (query: IGetAllServiceFilters) => {
             },
           },
         },
+        bookings: true,
       },
       take: limitInAPage,
       skip,
