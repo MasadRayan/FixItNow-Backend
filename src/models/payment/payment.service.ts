@@ -164,8 +164,43 @@ const getMyPaymentsFromDB = async (userId: string) => {
   return result;
 };
 
+const getMyPaymentByIdFromDB = async (userId: string, paymentId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, status: true },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.status === "BANNED") {
+    throw new AppError(httpStatus.FORBIDDEN, "Your account has been banned");
+  }
+
+  const result = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    include: {
+      booking: {
+        include: { service: true },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
+  }
+
+  if (result.customerId !== userId) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to view this payment");
+  }
+
+  return result;
+};
+
 export const paymentService = {
   createPayment,
   webhook,
-  getMyPaymentsFromDB
+  getMyPaymentsFromDB,
+  getMyPaymentByIdFromDB
 };
