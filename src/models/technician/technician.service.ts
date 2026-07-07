@@ -62,7 +62,11 @@ const updateTEchnicianProfileINDB = async (
   return updatedUser;
 };
 
+const getAllTechniciansFromDB = async () => {
+
+} 
 
 export const technicianService = {
   updateTEchnicianProfileINDB,
+  getAllTechniciansFromDB
 };

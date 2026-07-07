@@ -11,7 +11,13 @@ const updateUserProfiole = easycontroller(async (req: Request, res: Response, ne
     sendResponse(res, httpStatus.OK, true, "Technician profile updated successfully", result)
 })
 
+const getAllTechnicians = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await technicianService.getAllTechniciansFromDB()
+    sendResponse(res, httpStatus.OK, true, "Technicians fetched successfully", result)
+})
+
 
 export const technicianController = {
     updateUserProfiole,
+    getAllTechnicians
 }
