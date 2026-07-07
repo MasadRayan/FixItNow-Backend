@@ -4,3 +4,7 @@ export interface ICreateBooking {
   address: string;
   notes?: string;
 }
+
+export interface IupdateBookingStatus {
+  status: string;
+}

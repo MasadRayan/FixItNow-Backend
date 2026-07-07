@@ -2,7 +2,9 @@
 import httpStatus from "http-status";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { ICreateBooking } from "./booking.interface";
+import { ICreateBooking, IupdateBookingStatus } from "./booking.interface";
+import { th } from "zod/v4/locales/index.js";
+import { BookingStatus } from "../../../generated/prisma/enums";
 
 const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) => {
   const { serviceId, scheduledAt, address, notes } = payload;
@@ -98,6 +100,77 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
   return booking;
 };
 
+const allowedStatuses : BookingStatus[] = ["ACCEPTED", "DECLINED", "IN_PROGRESS", "COMPLETED"];
+
+const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
+  REQUESTED: ["ACCEPTED", "DECLINED"],
+  ACCEPTED: [],            
+  DECLINED: [],            
+  PAID: ["IN_PROGRESS"],
+  IN_PROGRESS: ["COMPLETED"],
+  COMPLETED: [],           
+  CANCELLED: [],           
+};
+
+const updateBookingStatusIntoDB = async (bookingId: string, payload: IupdateBookingStatus, technicianId: string) => {
+  const { status } = payload;
+
+  if (!allowedStatuses.includes(status as BookingStatus)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid status");
+  }
+
+  const validatedStatus = status as BookingStatus
+
+  const validTechnician = await prisma.technicianProfile.findUnique({
+    where: { userId: technicianId },
+  });
+
+  if (!validTechnician) {
+    throw new AppError(httpStatus.NOT_FOUND, "Technician not found");
+  }
+
+  const isBookingExists = await prisma.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+  })
+
+  if (!isBookingExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
+  }
+
+  if (isBookingExists.technicianId !== validTechnician.id) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to update this booking");
+  }
+
+  const currentStatus = isBookingExists.status;
+
+  if (currentStatus === validatedStatus) {
+    throw new AppError(httpStatus.CONFLICT, "Booking status is already set to this value");
+  }
+
+  const nextAllowed = allowedTransitions[currentStatus];
+  if (!nextAllowed.includes(validatedStatus)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Cannot change status from ${currentStatus} to ${validatedStatus}`
+    );
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: {
+      id: bookingId,
+    },
+    data: {
+      status: validatedStatus
+    }, 
+  });
+
+  return updatedBooking
+
+};
+
 export const bookingService = {
   createBookingIntoDB,
+  updateBookingStatusIntoDB,
 };

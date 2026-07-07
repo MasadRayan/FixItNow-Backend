@@ -11,6 +11,15 @@ const createBooking = easycontroller(async (req: Request, res: Response, next: N
     sendResponse(res, httpStatus.CREATED, true, "Booking created successfully", result)
 });
 
+const updateBookingStatus = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
+    const bookingId = req.params.id as string;
+    const payload = req.body;
+    const technicianId = req.user?.id
+    const result = await bookingService.updateBookingStatusIntoDB(bookingId, payload, technicianId as string);
+    sendResponse(res, httpStatus.OK, true, "Booking status updated successfully", result)
+})
+
 export const bookingController = {
-    createBooking
+    createBooking,
+    updateBookingStatus
 }
