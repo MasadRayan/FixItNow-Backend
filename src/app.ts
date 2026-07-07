@@ -7,6 +7,7 @@ import { technicianRouter } from "./models/technician/technician.route";
 import { adminRouter } from "./models/admin/admin.route";
 import { serviceRouter } from "./models/service/service.route";
 import { categoryRouter } from "./models/category/category.route";
+import { bookingRouter } from "./models/booking/booking.route";
 
 
 const app : Application = express();
@@ -35,6 +36,7 @@ app.use("/api/technician", technicianRouter)
 app.use("/api/admin", adminRouter)
 app.use("/api/services", serviceRouter)
 app.use("/api/category", categoryRouter)
+app.use("/api/bookings", bookingRouter)
 
 
 app.use(globalHandler)
