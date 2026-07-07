@@ -254,8 +254,73 @@ const getMyBookingsFromDB = async (userId: string, role: string) => {
   throw new AppError(httpStatus.FORBIDDEN, "Invalid role for this operation");
 };
 
+const getSingleBookingFromDB = async (bookingId: string, userId: string, role: string) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+        service: {
+          select: {
+            title: true,
+            description: true,
+            price: true,
+            durationMins: true,
+            isActive: true,
+            category: {
+              select: {
+                name: true,
+                description: true,
+              }
+            },
+          },
+        },
+        technician: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+            bio: true,
+            location: true,
+            experienceYrs: true,
+            hourlyRate: true,
+            totalReviews: true,
+            avgRating: true,
+          }
+        },
+        payment: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
+      },
+  });
+
+  if (!booking) {
+    throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
+  }
+
+  // Admin can see any booking — no ownership check needed
+  if (role === "ADMIN") {
+    return booking;
+  }
+
+  if (role === "CUSTOMER") {
+    if (booking.customerId !== userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to view this booking");
+    }
+    return booking;
+  }
+
+  throw new AppError(httpStatus.FORBIDDEN, "Invalid role for this operation");
+};
+
 export const bookingService = {
   createBookingIntoDB,
   updateBookingStatusIntoDB,
   getMyBookingsFromDB,
+  getSingleBookingFromDB
 };
