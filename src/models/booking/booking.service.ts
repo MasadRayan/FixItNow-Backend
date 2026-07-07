@@ -34,6 +34,9 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
 
   const service = await prisma.service.findUnique({
     where: { id: serviceId },
+    include: {
+        technician: true
+    }
   });
 
   if (!service) {
@@ -44,7 +47,17 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBooking) 
     throw new AppError(httpStatus.BAD_REQUEST, "This service is not currently active");
   }
 
-  // Prevent a technician from "booking" their own service
+  const technicianLocation = service.technician.location;
+  if (technicianLocation) {
+    const addressMatches = address.toLowerCase().includes(technicianLocation.toLowerCase());
+    if (!addressMatches) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `This technician only serves ${technicianLocation}. Please book a technician in your area.`
+      );
+    }
+  }
+
   const customerProfile = await prisma.technicianProfile.findUnique({
     where: { userId: customerId },
   });

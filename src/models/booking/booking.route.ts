@@ -5,6 +5,6 @@ import { Role } from "../../../generated/prisma/browser";
 
 const router = Router();
 
-router.post("/create", auth(Role.CUSTOMER, Role.ADMIN), bookingController.createBooking);
+router.post("/create", auth(Role.CUSTOMER, Role.ADMIN, Role.TECHNICIAN), bookingController.createBooking);
 
 export const bookingRouter = router

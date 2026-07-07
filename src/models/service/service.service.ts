@@ -150,7 +150,19 @@ const getAllServicesFromDB = async (query: IGetAllServiceFilters) => {
             },
           },
         },
-        bookings: true,
+        bookings: {
+          select: {
+            status: true,
+            address: true,
+            notes: true,
+            priceAtBooking: true,
+          }
+        },
+        _count: {
+          select: {
+            bookings: true
+          }
+        }
       },
       take: limitInAPage,
       skip,
