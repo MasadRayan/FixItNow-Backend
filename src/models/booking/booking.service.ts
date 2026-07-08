@@ -251,6 +251,18 @@ const getMyBookingsFromDB = async (userId: string, role: string) => {
       orderBy: { createdAt: "desc" },
     });
   }
+  if (role === "TECHNICIAN") {
+    const technicianProfile = await prisma.technicianProfile.findUnique({ where: { userId } });
+    if (!technicianProfile) {
+      throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+    }
+
+    return prisma.booking.findMany({
+      where: { technicianId: technicianProfile.id },
+      include: { service: true, customer: { select: { name: true, phone: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+  }
   throw new AppError(httpStatus.FORBIDDEN, "Invalid role for this operation");
 };
 
@@ -361,5 +373,5 @@ export const bookingService = {
   updateBookingStatusIntoDB,
   getMyBookingsFromDB,
   getSingleBookingFromDB,
-  cancelBookingIntoDB
+  cancelBookingIntoDB,
 };
