@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { easycontroller } from "../../utils/easyController";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status"
 import { bookingService } from "./booking.service";
+import { sendResponse } from "../../utils/sendResponse";
 
 const createBooking = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
     const userId = req.user?.id
     const result = await bookingService.createBookingIntoDB(userId as string ,payload)
-    sendResponse(res, httpStatus.CREATED, true, "Booking created successfully", result)
+    sendResponse(res, {statusCode:httpStatus.CREATED, success:true, message:"Booking created successfully", data:result})
 });
 
 const updateBookingStatus = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +16,7 @@ const updateBookingStatus = easycontroller(async (req: Request, res: Response, n
     const payload = req.body;
     const technicianId = req.user?.id
     const result = await bookingService.updateBookingStatusIntoDB(bookingId, payload, technicianId as string);
-    sendResponse(res, httpStatus.OK, true, "Booking status updated successfully", result)
+    sendResponse(res, {statusCode:httpStatus.OK, success:true, message:"Booking status updated successfully", data:result})
 })
 
 const getMyBookings = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ const getMyBookings = easycontroller(async (req: Request, res: Response, next: N
 
   const result = await bookingService.getMyBookingsFromDB(userId, role);
 
-  sendResponse(res, httpStatus.OK, true, "Bookings fetched successfully", result);
+  sendResponse(res, {statusCode:httpStatus.OK, success:true, message:"Bookings fetched successfully", data:result});
 });
 
 const getSingleBooking = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +35,7 @@ const getSingleBooking = easycontroller(async (req: Request, res: Response, next
 
   const result = await bookingService.getSingleBookingFromDB(id, userId, role);
 
-  sendResponse(res, httpStatus.OK, true, "Booking fetched successfully", result);
+  sendResponse(res, {statusCode:httpStatus.OK, success:true, message:"Booking fetched successfully", data:result});
 });
 
 const cancelBooking = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
@@ -45,7 +45,7 @@ const cancelBooking = easycontroller(async (req: Request, res: Response, next: N
 
   const result = await bookingService.cancelBookingIntoDB(id, customerId, payload);
 
-  sendResponse(res, httpStatus.OK, true, "Booking cancelled successfully", result);
+  sendResponse(res, {statusCode:httpStatus.OK, success:true, message:"Booking cancelled successfully", data:result});
 });
 
 export const bookingController = {

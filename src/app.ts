@@ -11,6 +11,7 @@ import { bookingRouter } from "./models/booking/booking.route";
 import { paymentRouter } from "./models/payment/payment.route";
 import { json } from "zod";
 import { reviewRouter } from "./models/review/review.route";
+import { routeNotFoundHandler } from "./middleware/routeNotFound";
 
 
 const app : Application = express();
@@ -45,6 +46,7 @@ app.use("/api/bookings", bookingRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/review", reviewRouter); 
 
+app.use(routeNotFoundHandler)
 
 app.use(globalHandler)
 
