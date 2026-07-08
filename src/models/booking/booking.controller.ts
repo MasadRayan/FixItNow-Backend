@@ -38,9 +38,20 @@ const getSingleBooking = easycontroller(async (req: Request, res: Response, next
   sendResponse(res, httpStatus.OK, true, "Booking fetched successfully", result);
 });
 
+const cancelBooking = easycontroller(async (req: Request, res: Response, next: NextFunction) => {
+  const id  = req.params.id as string;
+  const customerId = req.user?.id as string;
+  const payload = req.body;
+
+  const result = await bookingService.cancelBookingIntoDB(id, customerId, payload);
+
+  sendResponse(res, httpStatus.OK, true, "Booking cancelled successfully", result);
+});
+
 export const bookingController = {
     createBooking,
     updateBookingStatus,
     getMyBookings,
-    getSingleBooking
+    getSingleBooking,
+    cancelBooking
 }

@@ -10,5 +10,6 @@ router.post("/create", auth(Role.CUSTOMER), bookingController.createBooking);
 router.patch("/status/:id", auth(Role.TECHNICIAN), bookingController.updateBookingStatus);
 router.get("/", auth(Role.CUSTOMER), bookingController.getMyBookings);
 router.get("/:id", auth(Role.CUSTOMER, Role.ADMIN), bookingController.getSingleBooking);
+router.patch("/:id/cancel", auth(Role.CUSTOMER), bookingController.cancelBooking);
 
 export const bookingRouter = router

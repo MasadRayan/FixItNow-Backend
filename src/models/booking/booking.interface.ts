@@ -8,3 +8,7 @@ export interface ICreateBooking {
 export interface IupdateBookingStatus {
   status: string;
 }
+
+export interface ICancelBooking {
+  cancelReason?: string;
+}

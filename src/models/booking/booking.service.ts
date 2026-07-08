@@ -2,7 +2,7 @@
 import httpStatus from "http-status";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { ICreateBooking, IupdateBookingStatus } from "./booking.interface";
+import { ICancelBooking, ICreateBooking, IupdateBookingStatus } from "./booking.interface";
 import { th } from "zod/v4/locales/index.js";
 import { BookingStatus } from "../../../generated/prisma/enums";
 
@@ -318,9 +318,48 @@ const getSingleBookingFromDB = async (bookingId: string, userId: string, role: s
   throw new AppError(httpStatus.FORBIDDEN, "Invalid role for this operation");
 };
 
+const cancellableStatuses: BookingStatus[] = ["REQUESTED", "ACCEPTED", "PAID"];
+
+const cancelBookingIntoDB = async (
+  bookingId: string,
+  customerId: string,
+  payload: ICancelBooking
+) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+  });
+
+  if (!booking) {
+    throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
+  }
+
+  if (booking.customerId !== customerId) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to cancel this booking");
+  }
+
+  if (!cancellableStatuses.includes(booking.status)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Booking cannot be cancelled once it is ${booking.status}`
+    );
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: {
+      status: "CANCELLED",
+      cancelledAt: new Date(),
+      cancelReason: payload.cancelReason ?? "Cancelled by customer",
+    },
+  });
+
+  return updatedBooking;
+};
+
 export const bookingService = {
   createBookingIntoDB,
   updateBookingStatusIntoDB,
   getMyBookingsFromDB,
-  getSingleBookingFromDB
+  getSingleBookingFromDB,
+  cancelBookingIntoDB
 };
