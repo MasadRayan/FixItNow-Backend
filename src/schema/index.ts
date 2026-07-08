@@ -79,10 +79,8 @@ export const updateAvailabilitySchema = z
 
 export type IUpdateAvailability = z.infer<typeof updateAvailabilitySchema>;
 
-// ============================================================
-// ADMIN
-// ============================================================
 
+// ADMIN
 export const createCategorySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().optional(),
@@ -98,10 +96,7 @@ export const updateUserStatusSchema = z.object({
 
 export type IUpdateUserStatus = z.infer<typeof updateUserStatusSchema>;
 
-// ============================================================
 // SERVICE
-// ============================================================
-
 export const createServiceSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(1, "Description is required"),
@@ -112,10 +107,7 @@ export const createServiceSchema = z.object({
 
 export type ICreateService = z.infer<typeof createServiceSchema>;
 
-// ============================================================
 // BOOKING
-// ============================================================
-
 export const createBookingSchema = z.object({
   serviceId: z.string().min(1, "serviceId is required"),
   scheduledAt: z
@@ -143,20 +135,14 @@ export const cancelBookingSchema = z.object({
 
 export type ICancelBooking = z.infer<typeof cancelBookingSchema>;
 
-// ============================================================
 // PAYMENT
-// ============================================================
-
 export const createPaymentSchema = z.object({
   bookingId: z.string().min(1, "bookingId is required"),
 });
 
 export type ICreatePayment = z.infer<typeof createPaymentSchema>;
 
-// ============================================================
 // REVIEW
-// ============================================================
-
 export const createReviewSchema = z.object({
   bookingId: z.string().min(1, "bookingId is required"),
   rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
