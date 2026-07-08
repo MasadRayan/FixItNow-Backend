@@ -4,15 +4,14 @@ import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import {
   ITechnicianFilters,
-  IUpdateAvailability,
-  IupdateTechnicianProfile,
 } from "./technician.interface";
 import httpStatus from "http-status";
 import { DayOfWeek } from "../../../generated/prisma/enums";
+import { IUpdateAvailability, IUpdateTechnicianProfile } from "../../schema";
 
 const updateTEchnicianProfileINDB = async (
   userId: string,
-  payload: IupdateTechnicianProfile,
+  payload: IUpdateTechnicianProfile,
 ) => {
   const {
     name,

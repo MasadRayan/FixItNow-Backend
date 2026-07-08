@@ -1,10 +1,6 @@
-// schemas/index.ts (or split per-module if you prefer)
 import { z } from "zod";
 
-// ============================================================
-// AUTH
-// ============================================================
-
+//Auth
 const baseUserFields = {
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("A valid email is required"),
@@ -29,14 +25,12 @@ const technicianRegisterSchema = z.object({
   location: z.string().optional(),
 });
 
-// Validates differently depending on `role` — customers can't submit
-// technician-only fields, and role is guaranteed to be one of the two
+
 export const registerSchema = z.discriminatedUnion("role", [
   customerRegisterSchema,
   technicianRegisterSchema,
 ]);
 
-// Inferred type — always in sync with the schema, no manual interface needed
 export type ICreateUser = z.infer<typeof registerSchema>;
 
 export const loginSchema = z.object({
@@ -46,11 +40,13 @@ export const loginSchema = z.object({
 
 export type ILogin = z.infer<typeof loginSchema>;
 
-// ============================================================
-// TECHNICIAN
-// ============================================================
 
+// Technician
 export const updateTechnicianProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
+  phone: z.string().min(1, "Phone is required").optional(),
+  address: z.string().optional(),
+  avatarUrl: z.url().optional(),
   bio: z.string().optional(),
   skills: z.array(z.string()).optional(),
   hourlyRate: z.number().positive("hourlyRate must be a positive number").optional(),
