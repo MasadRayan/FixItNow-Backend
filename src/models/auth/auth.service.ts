@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { ICreateUser, ILoginUser } from "./auth.interface";
+import { ICreateUser, ILogin } from "../../schema/index";
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import config from "../../config";
@@ -73,7 +73,7 @@ const createUserIntoDB = async (payload: ICreateUser) => {
   return result;
 };
 
-const loginUser = async (payload: ILoginUser) => {
+const loginUser = async (payload: ILogin) => {
   const { email, password } = payload;
 
   const user = await prisma.user.findUnique({
