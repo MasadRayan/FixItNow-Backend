@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc",
-    "stripe:webhook": "stripe listen --forward-to localhost:3000/api/payment/confirm",
+    "build": "prisma generate && tsup",
+    "stripe:webhook": "stripe listen --forward-to https://fixitnow-two.vercel.app/api/payment/confirm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -37,6 +40,7 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
     "stripe": "^22.3.0",
+    "tsup": "^8.5.1",
     "zod": "^4.4.3"
   }
 }
