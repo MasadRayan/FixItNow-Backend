@@ -50,7 +50,7 @@ vercel.json                # Deployment config
 ### 1. Clone and install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/MasadRayan/FixItNow-Backend.git
 cd Batch-7-assignment-4
 npm install
 ```
@@ -60,19 +60,16 @@ npm install
 Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL="postgres://<user>:<password>@pooled.db.prisma.io:5432/postgres?sslmode=require"
-DIRECT_URL="postgres://<user>:<password>@db.prisma.io:5432/postgres?sslmode=require"
-
-JWT_ACCESS_SECRET="your-secret-here"
-JWT_ACCESS_EXPIRES_IN="7d"
-
-BCRYPT_SALT_ROUNDS=10
-
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-
-APP_URL="http://localhost:3000"
-NODE_ENV="development"
+DATABASE_URL="Your Database url"
+PORT=3000
+APP_URL="https://fixitnow-two.vercel.app"
+BCRYPT_SALT_ROUNDS="Your password salt round"
+JWT_ACCESS_SECRET="Your jwt access secret"
+JWT_REFRESH_SECRET="Your jwt refresh secret"
+JWT_ACCESS_EXPIRES_IN= "Accesstoken expires in Days"
+JWT_REFRESH_EXPIRES_IN= "Refreshtoken expires in Days"
+STRIPE_SECRET_KEY="Your Stripe secret key"
+STRIPE_WEBHOOK_SECRET="Your Stripe Webhook secret"
 ```
 
 ### 3. Generate the Prisma Client
