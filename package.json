@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
