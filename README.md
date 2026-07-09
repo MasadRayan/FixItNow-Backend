@@ -120,17 +120,6 @@ This forwards Stripe test events to your local `/api/payment/confirm` endpoint. 
 
 ---
 
-## 🔑 Test Credentials (from seed data)
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@fixitnow.com | admin123 |
-| Technician | kamal.electrician@example.com | password123 |
-| Technician | rafiq.plumber@example.com | password123 |
-| Customer | customer1@example.com | password123 |
-| Customer | customer2@example.com | password123 |
-
----
 
 ## 👥 Roles & Permissions
 
@@ -216,7 +205,7 @@ Currency: **BDT**. Test with Stripe's card `4242 4242 4242 4242`, any future exp
 - [x] 20+ meaningful backend commits
 - [x] Working admin credentials (see above, via seed script)
 - [x] Stripe payment integration — real Checkout Sessions + webhook confirmation, no simulated payments
-- [ ] API Documentation (Postman collection / Swagger) — *link here once exported*
+- [x] API Documentation (Postman collection / Swagger) — [link here ](https://documenter.getpostman.com/view/49925275/2sBY4JxiYa)
 
 ---
 
@@ -253,11 +242,3 @@ Environment variables must be set in Vercel's project dashboard (Settings → En
 
 - **No automatic refunds** — cancelling a `PAID` booking changes its status but does not trigger a Stripe refund; this would need a `stripe.refunds.create()` call added to the cancellation flow.
 - **Location matching is substring-based**, not geocoded — a technician's `location` field is matched against the booking `address` as a simple case-insensitive substring check, not real distance/radius filtering.
-- **Technician verification is manual** — there's no dedicated admin endpoint yet to flip `TechnicianProfile.isVerified`; it's currently set directly in the database (seed data, or via Prisma Studio).
-- **No single-booking detail route for technicians** — technicians currently only see their bookings via the list endpoint, not a dedicated `/api/technician/bookings/:id`.
-
----
-
-## 📄 License
-
-ISC
