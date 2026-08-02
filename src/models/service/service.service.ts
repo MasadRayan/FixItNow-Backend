@@ -203,7 +203,79 @@ const getAllServicesFromDB = async (query: IGetAllServiceFilters) => {
   };
 };
 
+const getServiceByIdFromDB = async (id: string) => {
+  const service = await prisma.service.findUnique({
+    where: {
+      id,
+      isActive: true,
+    },
+    include: {
+      category: {
+        select: {
+          name: true,
+          description: true,
+          iconUrl: true,
+        },
+      },
+      technician: {
+        select: {
+          user: {
+            select: {
+              name: true,
+              avatarUrl: true,
+              email: true,
+              phone: true,
+            },
+          },
+          bio: true,
+          skills: true,
+          experienceYrs: true,
+          location: true,
+          avgRating: true,
+          totalReviews: true,
+          isVerified: true,
+        },
+      },
+      bookings: {
+        where: {
+          review: {
+            isNot: null,
+          },
+        },
+        select: {
+          review: {
+            select: {
+              id: true,
+              rating: true,
+              comment: true,
+              createdAt: true,
+              customer: {
+                select: {
+                  name: true,
+                  avatarUrl: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
+    },
+  });
+
+  if (!service) {
+    throw new AppError(httpStatus.NOT_FOUND, "Service not found");
+  }
+
+  return service;
+};
+
 export const serviceService = {
   createServiceIntoDB,
   getAllServicesFromDB,
+  getServiceByIdFromDB,
 };
