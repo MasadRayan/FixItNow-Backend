@@ -84,7 +84,7 @@ const createPayment = async (userId: string, payload: ICreatePayment) => {
         quantity: 1,
       },
     ],
-    success_url: `${config.app_url}/payment/success?tran_id=${transactionId}`,
+    success_url: `${config.app_url}/dashboard/bookings`,
     cancel_url: `${config.app_url}/payment/cancel?tran_id=${transactionId}`,
     metadata: {
       bookingId: booking.id,
